@@ -21,7 +21,7 @@
 ```
 config.vm.network "forwarded_port", guest: 80, host: 8080 # for nginx
 config.vm.network "forwarded_port", guest: 3000, host: 3080 # for rails
-config.vm.network "forwarded_port", guest: 5432, host: 5432 # for
+config.vm.network "forwarded_port", guest: 5432, host: 5432 # for postgresql
 
 config.vm.provider :virtualbox do |v|
   v.memory = 3072
