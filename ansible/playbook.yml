@@ -3,6 +3,11 @@
   sudo: yes
   vars:
     vagrant_home: "/home/vagrant"
+    nvm_install_dir: /opt/nvm
+    nvm_node_version: 6.1.0
+    nvm_version: 0.32.0
+    ruby_version: 2.3.1
   roles:
     - docker
     - rbenv
+    - node

@@ -1,0 +1,53 @@
+---
+- name: create nvm directoryc
+  file: dest={{nvm_install_dir}} state=directory
+  tags: nvm
+
+- name: install nvm
+  get_url:
+    url: https://raw.githubusercontent.com/creationix/nvm/v{{nvm_version}}/nvm.sh
+    validate_certs: no
+    dest: "{{nvm_install_dir}}/nvm.sh"
+  tags: nvm
+
+- name: set profile
+  template: src=nvm.sh.j2 dest=/etc/profile.d/nvm.sh
+  tags: nvm
+
+- name: Install {{ nvm_node_version }}
+  shell: source /etc/profile && nvm install {{ nvm_node_version }} executable=/bin/bash
+  register: nvm_install_result
+  changed_when: "'is already installed.' not in nvm_install_result.stdout"
+  tags: nvm
+
+- name: Check if {{ nvm_node_version }} is the default node version
+  shell: source /etc/profile && nvm ls | grep -e 'default -> {{ nvm_node_version }}' executable=/bin/bash
+  register: nvm_check_default
+  changed_when: False
+  ignore_errors: True
+  tags: nvm
+
+- name: Set default node version to {{ nvm_node_version }}
+  shell: source /etc/profile &&  nvm alias default {{ nvm_node_version }}
+  when: nvm_check_default|failed
+  tags: nvm
+
+- name: which node
+  shell: source /etc/profile &&  which node executable=/bin/bash
+  register: nvm_node_install_path
+  changed_when: false
+  tags: nvm
+
+- name: link bin node
+  file: src="{{nvm_node_install_path.stdout}}" dest=/usr/bin/node state=link force=yes
+  when: nvm_node_install_path.stdout is defined
+
+- name: which npm
+  shell: source /etc/profile && which npm executable=/bin/bash
+  register: nvm_npm_install_path
+  changed_when: false
+  tags: nvm
+
+- name: link bin npm
+  file: src="{{nvm_npm_install_path.stdout}}" dest=/usr/bin/npm state=link force=yes
+  when: nvm_npm_install_path.stdout is defined

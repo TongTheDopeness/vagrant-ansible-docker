@@ -14,18 +14,17 @@ Vagrant.configure("2") do |config|
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "ubuntu/trusty64"
   config.vm.network "private_network", ip: "192.168.100.50"
-  
+
   config.vm.network "forwarded_port", guest: 80, host: 8080
   config.vm.network "forwarded_port", guest: 3000, host: 3080
-  config.vm.network "forwarded_port", guest: 5432, host: 5432
+  config.vm.network "forwarded_port", guest: 5432, host: 5433
 
   config.vm.provider :virtualbox do |v|
     v.memory = 3072
     v.cpus = 2
   end
 
-  config.vm.synced_folder "./", "/vagrant", :mount_options => ['dmode=775', 'fmode=664']
-
+  config.vm.synced_folder "./", "/vagrant", type: "nfs"
   config.vm.provision "shell", :path => "provision.sh"
 
   # Disable automatic box update checking. If you disable this, then
