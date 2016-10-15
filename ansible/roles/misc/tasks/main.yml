@@ -4,4 +4,6 @@
   template: src=git_branch.sh dest=/etc/profile.d/git_branch.sh
 
 - name: source profile
-  shell: echo source /etc/profile >> {{ vagrant_home }}/.bashrc
+  lineinfile: >
+    dest={{ vagrant_home }}/.bashrc
+    line='source /etc/profile'

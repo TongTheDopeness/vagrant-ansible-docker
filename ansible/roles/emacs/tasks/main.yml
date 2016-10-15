@@ -10,7 +10,7 @@
   when: result1|failed
 
 - name: extract gz
-  command: chdir={{src_dir}} tar xvf emacs-{{emacs_ver}}.tar.gz
+  command: chdir={{src_dir}} tar xvf emacs-{{emacs_version}}.tar.gz
   when: result1|failed
 
 - name: check emacs install
@@ -33,3 +33,56 @@
 - name: install emacs
   command: chdir={{src_dir}}/emacs-{{emacs_version}} make install
   when: result2|failed
+
+- name: check exist cask file
+  command: ls -l {{ vagrant_home }}/.install_cask
+  sudo: yes
+  sudo_user: vagrant
+  ignore_errors: yes
+  register: has_cask
+
+- name: download cask
+  command: chdir={{ vagrant_home }} wget https://raw.githubusercontent.com/cask/cask/master/go -O .install_cask
+  sudo: yes
+  sudo_user: vagrant
+  when: has_cask|failed
+
+- name: install cask
+  command: chdir={{ vagrant_home }} python .install_cask
+  sudo: yes
+  sudo_user: vagrant
+  when: has_cask|failed
+
+- name: set .emacs
+  template: src=.emacs dest={{ vagrant_home }}/.emacs
+  sudo: yes
+  sudo_user: vagrant
+
+- name: check exist Cask file
+  command: ls -l {{ vagrant_home }}/.emacs.d/Cask
+  sudo: yes
+  sudo_user: vagrant
+  ignore_errors: yes
+  register: has_caskfile
+
+- name: remove .emacs.d
+  file: path={{ vagrant_home }}/.emacs.d state=absent
+  when: has_caskfile|failed
+  sudo: yes
+  sudo_user: vagrant
+
+- name: cloning .emacs.d
+  command: chdir={{ vagrant_home }} git clone https://github.com/TongTheDopeness/cask.git .emacs.d
+  when: has_caskfile|failed
+  sudo: yes
+  sudo_user: vagrant
+
+- name: set cask path
+  lineinfile: >
+    dest={{ vagrant_home }}/.bashrc
+    line='export PATH=$HOME/.cask/bin:$PATH'
+
+- name: cask install
+  command: chdir={{ vagrant_home }}/.emacs.d  source {{ vagrant_home }}/.bashrc && cask install executable=/bin/bash
+  sudo: yes
+  sudo_user: vagrant
