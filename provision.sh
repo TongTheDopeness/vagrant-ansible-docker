@@ -13,4 +13,5 @@ if ! [ `which docker` ]; then
     apt-get install -y linux-image-generic-lts-trusty
 fi
 
+chmod 666 /vagrant/ansible/host
 ansible-playbook -i /vagrant/ansible/host /vagrant/ansible/playbook.yml

@@ -19,3 +19,4 @@
     dest: /usr/local/bin/docker-compose
 - name: Ensure docker-compose is executable
   file: path=/usr/local/bin/docker-compose state=touch mode=0755
+  

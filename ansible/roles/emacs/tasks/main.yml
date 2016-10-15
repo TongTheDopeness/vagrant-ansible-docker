@@ -1,0 +1,35 @@
+---
+
+- name: check exist emacs source file
+  command: ls -l {{src_dir}}/emacs-{{emacs_version}}.tar.gz
+  ignore_errors: yes
+  register: result1
+
+- name: get emacs source file
+  command: chdir={{src_dir}} wget http://ftp.jaist.ac.jp/pub/GNU/emacs/emacs-{{ emacs_version }}.tar.gz
+  when: result1|failed
+
+- name: extract gz
+  command: chdir={{src_dir}} tar xvf emacs-{{emacs_ver}}.tar.gz
+  when: result1|failed
+
+- name: check emacs install
+  command: which emacs
+  ignore_errors: yes
+  register: result2
+
+- name: expand emacs src
+  command: chdir={{src_dir}} tar xvf emacs-{{emacs_version}}.tar.gz
+  when: result2|failed
+
+- name: comfigure emacs
+  command: chdir={{src_dir}}/emacs-{{emacs_version}} ./configure --with-x-toolkit=no --with-xpm=no --with-jpeg=no --with-gif=no --with-tiff=no
+  when: result2|failed
+
+- name: make emacs
+  command: chdir={{src_dir}}/emacs-{{emacs_version}} make
+  when: result2|failed
+
+- name: install emacs
+  command: chdir={{src_dir}}/emacs-{{emacs_version}} make install
+  when: result2|failed
