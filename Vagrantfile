@@ -24,7 +24,8 @@ Vagrant.configure("2") do |config|
     v.cpus = 2
   end
 
-  config.vm.synced_folder "./", "/vagrant", type: "nfs"
+  config.vm.synced_folder "./", "/vagrant", :mount_options => ['dmode=775', 'fmode=664']
+  # config.vm.synced_folder ""
   config.vm.provision "shell", :path => "provision.sh"
 
   # Disable automatic box update checking. If you disable this, then

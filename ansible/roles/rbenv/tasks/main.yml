@@ -24,6 +24,8 @@
     - libfontconfig1-dev
     - libxft-dev
     - libpq-dev
+    - sqlite3
+    - libsqlite3-dev
 
 - name: install rbenv
   git: repo=https://github.com/sstephenson/rbenv.git
